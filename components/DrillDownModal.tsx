@@ -73,25 +73,25 @@ export const DrillDownModal: React.FC<DrillDownModalProps> = ({ customer, brand,
           onKeyDown={handleTableKeyDown}
           className="flex-1 overflow-auto custom-scrollbar px-8 pb-8 font-sans outline-none focus:ring-2 focus:ring-blue-100 transition-all"
         >
-          <table className="w-full text-left border-collapse rounded-lg border border-slate-200 shadow-sm min-w-[800px]">
+          <table className="w-full text-left border-collapse rounded-lg border border-slate-300 shadow-sm min-w-[800px]">
             <thead className="sticky top-0 z-10">
               <tr className="bg-[#34495e] text-white">
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-600/30">Date</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-600/30">Invoice #</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-600/30">Sales Person</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-600/30">Item Name</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-600/30">Brand</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-500/50">Date</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-500/50">Invoice #</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-500/50">Sales Person</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-500/50">Item Name</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider border-r border-slate-500/50">Brand</th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-right">Quantity</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-300">
               {data.map((row, i) => (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-slate-600 font-medium">{row.date}</td>
-                  <td className="px-6 py-4 text-sm text-slate-900 font-bold">{row.invoice}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{row.salesperson}</td>
-                  <td className="px-6 py-4 text-sm text-slate-700 font-medium uppercase">{row.item}</td>
-                  <td className="px-6 py-4 text-sm text-slate-500">{row.brand}</td>
+                <tr key={i} className="hover:bg-slate-100 transition-colors">
+                  <td className="px-6 py-4 text-sm text-slate-600 font-medium border-r border-slate-200">{row.date}</td>
+                  <td className="px-6 py-4 text-sm text-slate-900 font-bold border-r border-slate-200">{row.invoice}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600 border-r border-slate-200">{row.salesperson}</td>
+                  <td className="px-6 py-4 text-sm text-slate-700 font-medium uppercase border-r border-slate-200">{row.item}</td>
+                  <td className="px-6 py-4 text-sm text-slate-500 border-r border-slate-200">{row.brand}</td>
                   <td className="px-6 py-4 text-sm font-bold text-slate-900 text-right">{row.totalQty.toLocaleString()}</td>
                 </tr>
               ))}

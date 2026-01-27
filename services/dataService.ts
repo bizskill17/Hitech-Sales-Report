@@ -1,5 +1,5 @@
 
-import { RawSalesRecord } from '../types';
+import { RawSalesRecord } from '../types.ts';
 
 /**
  * Parses a CSV string into an array of objects.

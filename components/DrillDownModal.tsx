@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { RawSalesRecord } from '../types';
+import { RawSalesRecord } from '../types.ts';
 
 interface DrillDownModalProps {
   customer: string;

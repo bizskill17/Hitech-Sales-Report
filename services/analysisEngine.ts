@@ -1,7 +1,7 @@
 
-import { RawSalesRecord, Filters, PivotRow, SummaryRow } from '../types';
-import { parseDate, getFiscalYearStart } from './dataService';
-import { SHORT_MONTH_NAMES, MONTH_NAMES } from '../constants';
+import { RawSalesRecord, Filters, PivotRow, SummaryRow } from '../types.ts';
+import { parseDate, getFiscalYearStart } from './dataService.ts';
+import { SHORT_MONTH_NAMES, MONTH_NAMES } from '../constants.tsx';
 
 export const filterData = (data: RawSalesRecord[], filters: Filters): RawSalesRecord[] => {
   return data.filter(row => {

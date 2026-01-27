@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { RawSalesRecord, Filters, TabType } from './types';
-import { fetchDataFromSource, getFiscalYearStart, getFiscalYearDisplay } from './services/dataService';
-import { filterData, getM2MData, getY2YData, getSummaryData } from './services/analysisEngine';
-import { MultiSelect } from './components/MultiSelect';
-import { DrillDownModal } from './components/DrillDownModal';
-import { MONTH_NAMES } from './constants';
+import { RawSalesRecord, Filters, TabType } from './types.ts';
+import { fetchDataFromSource, getFiscalYearStart, getFiscalYearDisplay } from './services/dataService.ts';
+import { filterData, getM2MData, getY2YData, getSummaryData } from './services/analysisEngine.ts';
+import { MultiSelect } from './components/MultiSelect.tsx';
+import { DrillDownModal } from './components/DrillDownModal.tsx';
+import { MONTH_NAMES } from './constants.tsx';
 
 const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzJtYtjYi9qRtioYYquAobvWT9FifJWTo_zaz_Du-bKpQdyEmAXLF2oaGAW6FUjxA6A/exec';
 

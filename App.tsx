@@ -335,7 +335,8 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        <div key={`filters-${activeTab}`} className="bg-white rounded-xl shadow-sm p-8 mb-8 border border-slate-200 animate-tab-content">
+        {/* Filters Container - Added z-30 relative to prevent dropdown hide inside table */}
+        <div key={`filters-${activeTab}`} className="bg-white rounded-xl shadow-sm p-8 mb-8 border border-slate-200 animate-tab-content relative z-30">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
             {activeTab === TabType.SUMMARY && (
               <>
@@ -431,7 +432,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div key={`content-${activeTab}`} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-tab-content">
+        {/* Content Container - Added relative z-10 */}
+        <div key={`content-${activeTab}`} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-tab-content relative z-10">
           <div className="px-8 py-5 border-b border-slate-100 bg-white flex justify-between items-center">
             <h2 className="text-lg font-bold text-slate-800">
               {activeTab === TabType.SUMMARY && 'Sales Summary'}
@@ -497,10 +499,10 @@ const App: React.FC = () => {
               <table className="w-full text-left border-collapse border border-slate-200">
                 <thead className="sticky top-0 z-20">
                   <tr className="bg-[#34495e] text-white">
-                    <th onClick={() => handleSortToggle('customer')} className="group px-8 py-4 text-xs font-bold uppercase sticky left-0 bg-[#34495e] z-30 border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[200px] transition-colors">
+                    <th onClick={() => handleSortToggle('customer')} className="group px-8 py-4 text-xs font-bold uppercase sticky left-0 bg-[#34495e] z-40 border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[220px] w-[220px] transition-colors">
                       <div className="flex items-center justify-between"><span>CUSTOMER</span> {renderSortIcon('customer')}</div>
                     </th>
-                    <th onClick={() => handleSortToggle('brand')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
+                    <th onClick={() => handleSortToggle('brand')} className="group px-8 py-4 text-xs font-bold uppercase sticky left-[220px] bg-[#34495e] z-40 border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[140px] w-[140px] transition-colors">
                       <div className="flex items-center justify-between"><span>BRAND</span> {renderSortIcon('brand')}</div>
                     </th>
                     <th onClick={() => handleSortToggle('salesperson')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
@@ -519,10 +521,10 @@ const App: React.FC = () => {
                 <tbody className="divide-y divide-slate-300 text-slate-700">
                   {m2m.pivotData.map((row, i) => (
                     <tr key={i} className="hover:bg-slate-100 transition-colors">
-                      <td className="px-8 py-4 text-[13px] font-bold sticky left-0 bg-white shadow-sm z-10 border-r border-slate-200">
+                      <td className="px-8 py-4 text-[13px] font-bold sticky left-0 bg-white shadow-sm z-10 border-r border-slate-200 min-w-[220px] w-[220px]">
                         <button onClick={() => setDrillDownInfo({ customer: row.customer, brand: row.brand })} className="text-blue-600 uppercase hover:underline text-left font-bold">{row.customer}</button>
                       </td>
-                      <td className="px-8 py-4 text-[13px] text-slate-500 uppercase border-r border-slate-200">{row.brand}</td>
+                      <td className="px-8 py-4 text-[13px] text-slate-500 uppercase sticky left-[220px] bg-white shadow-sm z-10 border-r border-slate-200 min-w-[140px] w-[140px]">{row.brand}</td>
                       <td className="px-8 py-4 text-[13px] text-slate-500 uppercase font-medium border-r border-slate-200">{row.salesperson}</td>
                       {m2m.monthHeaders.map(h => {
                         const val = row[h] as number || 0;
@@ -535,8 +537,8 @@ const App: React.FC = () => {
                 {m2m.pivotData.length > 0 && (
                   <tfoot className="sticky bottom-0 border-t-2 border-slate-300 bg-slate-50 font-black text-slate-900 z-20">
                     <tr>
-                      <td className="px-8 py-4 text-sm uppercase sticky left-0 bg-slate-50 shadow-sm z-30 border-r border-slate-200">Total</td>
-                      <td className="px-8 py-4 text-sm border-r border-slate-200"></td>
+                      <td className="px-8 py-4 text-sm uppercase sticky left-0 bg-slate-50 shadow-sm z-30 border-r border-slate-200 min-w-[220px] w-[220px]">Total</td>
+                      <td className="px-8 py-4 text-sm sticky left-[220px] bg-slate-50 shadow-sm z-30 border-r border-slate-200 min-w-[140px] w-[140px]"></td>
                       <td className="px-8 py-4 text-sm border-r border-slate-200"></td>
                       {m2m.monthHeaders.map(h => (
                         <td key={h} className="px-6 py-4 text-xs text-center border-r border-slate-200">{m2m.pivotData.reduce((acc, r) => acc + (r[h] as number || 0), 0).toLocaleString()}</td>
@@ -552,10 +554,10 @@ const App: React.FC = () => {
               <table className="w-full text-left border-collapse border border-slate-200">
                 <thead className="sticky top-0 z-20">
                   <tr className="bg-[#34495e] text-white">
-                    <th onClick={() => handleSortToggle('customer')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 sticky left-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none min-w-[200px] transition-colors">
+                    <th onClick={() => handleSortToggle('customer')} className="group px-8 py-4 text-xs font-bold uppercase sticky left-0 bg-[#34495e] z-40 border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[220px] w-[220px] transition-colors">
                       <div className="flex items-center justify-between"><span>CUSTOMER</span> {renderSortIcon('customer')}</div>
                     </th>
-                    <th onClick={() => handleSortToggle('brand')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
+                    <th onClick={() => handleSortToggle('brand')} className="group px-8 py-4 text-xs font-bold uppercase sticky left-[220px] bg-[#34495e] z-40 border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[140px] w-[140px] transition-colors">
                       <div className="flex items-center justify-between"><span>BRAND</span> {renderSortIcon('brand')}</div>
                     </th>
                     <th onClick={() => handleSortToggle('salesperson')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
@@ -579,7 +581,7 @@ const App: React.FC = () => {
                     ))}
                     {/* FY Wise totals sub-headers on same line */}
                     {y2y.fiscalYears.map((fy) => (
-                      <th key={`total-fy-${fy}`} onClick={() => handleSortToggle(`total-fy-${fy}`)} className="group px-3 py-4 text-[10px] font-black uppercase text-center border-r border-slate-500/30 sticky right-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none transition-colors min-w-[120px]">
+                      <th key={`total-fy-${fy}`} onClick={() => handleSortToggle(`total-fy-${fy}`)} className="group px-3 py-4 text-[10px] font-black uppercase text-center border-r border-slate-500/30 sticky right-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none min-w-[120px]">
                         <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
                           <span>TOTAL</span>
                           <span className="opacity-60 text-[9px]">({getFiscalYearDisplay(fy)})</span>
@@ -595,10 +597,10 @@ const App: React.FC = () => {
                 <tbody className="divide-y divide-slate-300">
                   {y2y.pivotData.map((row, i) => (
                     <tr key={i} className="hover:bg-slate-100 transition-colors">
-                      <td className="px-8 py-4 text-[13px] font-bold sticky left-0 bg-white z-10 shadow-sm border-r border-slate-200">
+                      <td className="px-8 py-4 text-[13px] font-bold sticky left-0 bg-white z-10 shadow-sm border-r border-slate-200 min-w-[220px] w-[220px]">
                         <button onClick={() => setDrillDownInfo({ customer: row.customer, brand: row.brand })} className="text-blue-600 uppercase hover:underline text-left font-bold">{row.customer}</button>
                       </td>
-                      <td className="px-8 py-4 text-[13px] text-slate-500 uppercase border-r border-slate-200">{row.brand}</td>
+                      <td className="px-8 py-4 text-[13px] text-slate-500 uppercase sticky left-[220px] bg-white z-10 shadow-sm border-r border-slate-200 min-w-[140px] w-[140px]">{row.brand}</td>
                       <td className="px-8 py-4 text-[13px] text-slate-500 uppercase font-medium border-r border-slate-200">{row.salesperson}</td>
                       {y2y.monthOrder.map(month => (
                         y2y.fiscalYears.map((fy, fyIdx) => {
@@ -628,8 +630,8 @@ const App: React.FC = () => {
                 {y2y.pivotData.length > 0 && (
                   <tfoot className="sticky bottom-0 border-t-2 border-slate-300 bg-slate-50 font-black text-slate-900 z-20">
                     <tr>
-                      <td className="px-8 py-4 text-sm uppercase sticky left-0 bg-slate-50 shadow-sm z-30 border-r border-slate-200">Total</td>
-                      <td className="px-8 py-4 text-sm border-r border-slate-200"></td>
+                      <td className="px-8 py-4 text-sm uppercase sticky left-0 bg-slate-50 shadow-sm z-30 border-r border-slate-200 min-w-[220px] w-[220px]">Total</td>
+                      <td className="px-8 py-4 text-sm sticky left-[220px] bg-slate-50 shadow-sm z-30 border-r border-slate-200 min-w-[140px] w-[140px]"></td>
                       <td className="px-8 py-4 text-sm border-r border-slate-200"></td>
                       {y2y.monthOrder.map(month => (
                         y2y.fiscalYears.map((fy, fyIdx) => {

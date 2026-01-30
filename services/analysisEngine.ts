@@ -120,12 +120,14 @@ export const getY2YData = (data: RawSalesRecord[]) => {
     const monthIdx = date.getMonth();
     const monthName = SHORT_MONTH_NAMES[monthIdx];
     const fyKey = `${fy}-${monthName}`;
+    const fyTotalKey = `total-fy-${fy}`;
 
     if (!acc[key]) {
       acc[key] = { customer: row.customer, brand: row.brand, salesperson: row.salesperson, total: 0 };
     }
 
     acc[key][fyKey] = (acc[key][fyKey] as number || 0) + row.totalQty;
+    acc[key][fyTotalKey] = (acc[key][fyTotalKey] as number || 0) + row.totalQty;
     acc[key].total += row.totalQty;
     return acc;
   }, {} as Record<string, PivotRow>);

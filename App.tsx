@@ -230,11 +230,16 @@ const App: React.FC = () => {
           numericKeys.push(`${fy}-${month}`);
         });
       });
-      headers.push("Total");
+      // Add FY totals headers
+      y2y.fiscalYears.forEach(fy => {
+        headers.push(`Total ${getFiscalYearDisplay(fy)}`);
+      });
+      headers.push("Grand Total");
 
       rows = y2y.pivotData.map(row => {
         const rowData = [row.customer, row.brand, row.salesperson];
         numericKeys.forEach(key => rowData.push(row[key] || 0));
+        y2y.fiscalYears.forEach(fy => rowData.push(row[`total-fy-${fy}`] || 0));
         rowData.push(row.total);
         return rowData;
       });
@@ -242,6 +247,9 @@ const App: React.FC = () => {
       const totalRow = ["TOTAL", "", ""];
       numericKeys.forEach(key => {
         totalRow.push(y2y.pivotData.reduce((acc, r) => acc + (r[key] as number || 0), 0));
+      });
+      y2y.fiscalYears.forEach(fy => {
+        totalRow.push(y2y.pivotData.reduce((acc, r) => acc + (r[`total-fy-${fy}`] as number || 0), 0));
       });
       totalRow.push(y2y.pivotData.reduce((acc, r) => acc + r.total, 0));
       rows.push(totalRow);
@@ -544,34 +552,44 @@ const App: React.FC = () => {
               <table className="w-full text-left border-collapse border border-slate-200">
                 <thead className="sticky top-0 z-20">
                   <tr className="bg-[#34495e] text-white">
-                    <th rowSpan={2} onClick={() => handleSortToggle('customer')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 sticky left-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none min-w-[200px] transition-colors">
+                    <th onClick={() => handleSortToggle('customer')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 sticky left-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none min-w-[200px] transition-colors">
                       <div className="flex items-center justify-between"><span>CUSTOMER</span> {renderSortIcon('customer')}</div>
                     </th>
-                    <th rowSpan={2} onClick={() => handleSortToggle('brand')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
+                    <th onClick={() => handleSortToggle('brand')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
                       <div className="flex items-center justify-between"><span>BRAND</span> {renderSortIcon('brand')}</div>
                     </th>
-                    <th rowSpan={2} onClick={() => handleSortToggle('salesperson')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 sticky left-0 z-10 bg-[#34495e] cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
+                    <th onClick={() => handleSortToggle('salesperson')} className="group px-8 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer hover:bg-slate-700 select-none min-w-[150px] transition-colors">
                       <div className="flex items-center justify-between"><span>SALES PERSON</span> {renderSortIcon('salesperson')}</div>
                     </th>
-                    {y2y.monthOrder.map(month => (
-                      <th key={month} colSpan={y2y.fiscalYears.length} className="px-4 py-2 text-[10px] font-black border-r border-slate-500/50 text-center uppercase tracking-widest">{month}</th>
-                    ))}
-                    <th rowSpan={2} onClick={() => handleSortToggle('total')} className="group px-8 py-4 text-xs font-bold uppercase text-right sticky right-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none min-w-[100px] transition-colors">
-                      <div className="flex items-center justify-end">TOTAL {renderSortIcon('total')}</div>
-                    </th>
-                  </tr>
-                  <tr className="bg-[#2c3e50] text-white/70 text-[9px] font-bold">
+                    {/* Simplified Header: Month and FY on the same horizontal line */}
                     {y2y.monthOrder.map(month => (
                       y2y.fiscalYears.map((fy, fyIdx) => {
                         const key = `${fy}-${month}`;
                         const isLastYearInMonth = fyIdx === y2y.fiscalYears.length - 1;
                         return (
-                          <th key={key} onClick={() => handleSortToggle(key)} className={`group px-2 py-2 border-r border-slate-500/30 text-center cursor-pointer hover:bg-slate-700 select-none transition-colors ${isLastYearInMonth ? 'border-r-2 border-slate-500' : ''}`}>
-                            <div className="flex items-center justify-center">{getFiscalYearDisplay(fy)} {renderSortIcon(key)}</div>
+                          <th key={key} onClick={() => handleSortToggle(key)} className={`group px-3 py-4 text-[10px] font-black uppercase text-center border-r border-slate-500/30 cursor-pointer hover:bg-slate-700 select-none transition-colors min-w-[120px] ${isLastYearInMonth ? 'border-r-2 border-slate-500' : ''}`}>
+                            <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                              <span>{month}</span>
+                              <span className="opacity-60 text-[9px]">({getFiscalYearDisplay(fy)})</span>
+                              {renderSortIcon(key)}
+                            </div>
                           </th>
                         );
                       })
                     ))}
+                    {/* FY Wise totals sub-headers on same line */}
+                    {y2y.fiscalYears.map((fy) => (
+                      <th key={`total-fy-${fy}`} onClick={() => handleSortToggle(`total-fy-${fy}`)} className="group px-3 py-4 text-[10px] font-black uppercase text-center border-r border-slate-500/30 sticky right-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none transition-colors min-w-[120px]">
+                        <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <span>TOTAL</span>
+                          <span className="opacity-60 text-[9px]">({getFiscalYearDisplay(fy)})</span>
+                          {renderSortIcon(`total-fy-${fy}`)}
+                        </div>
+                      </th>
+                    ))}
+                    <th onClick={() => handleSortToggle('total')} className="group px-6 py-4 text-xs font-bold uppercase text-right sticky right-0 bg-[#34495e] z-30 cursor-pointer hover:bg-slate-700 select-none min-w-[120px] transition-colors border-l-2 border-slate-500">
+                      <div className="flex items-center justify-end text-center leading-tight whitespace-nowrap">GRAND TOTAL {renderSortIcon('total')}</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300">
@@ -594,7 +612,16 @@ const App: React.FC = () => {
                           );
                         })
                       ))}
-                      <td className="px-8 py-4 text-sm font-bold text-slate-900 text-right sticky right-0 bg-slate-50 z-10 shadow-sm border-l border-slate-200">{row.total.toLocaleString()}</td>
+                      {/* FY Wise Totals cells */}
+                      {y2y.fiscalYears.map((fy) => {
+                        const val = row[`total-fy-${fy}`] as number || 0;
+                        return (
+                          <td key={`total-fy-cell-${fy}`} className="px-2 py-4 text-xs font-bold text-center border-r border-slate-200 sticky right-0 bg-slate-50/50 z-10 shadow-sm">
+                            {val === 0 ? '-' : val.toLocaleString()}
+                          </td>
+                        );
+                      })}
+                      <td className="px-8 py-4 text-sm font-black text-slate-900 text-right sticky right-0 bg-slate-50 z-10 shadow-sm border-l border-slate-200">{row.total.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -614,6 +641,12 @@ const App: React.FC = () => {
                             </td>
                           );
                         })
+                      ))}
+                      {/* FY Wise footer totals */}
+                      {y2y.fiscalYears.map((fy) => (
+                         <td key={`total-fy-foot-${fy}`} className="px-2 py-4 text-xs text-center border-r border-slate-200 sticky right-0 bg-slate-50 shadow-sm z-30">
+                            {y2y.pivotData.reduce((acc, row) => acc + (row[`total-fy-${fy}`] as number || 0), 0).toLocaleString()}
+                         </td>
                       ))}
                       <td className="px-8 py-4 text-sm text-right sticky right-0 bg-slate-50 shadow-sm z-30 border-l border-slate-200">{y2y.pivotData.reduce((acc, row) => acc + row.total, 0).toLocaleString()}</td>
                     </tr>

@@ -21,6 +21,24 @@ const initialFilters: Filters = {
   months: []
 };
 
+const getDateInputValue = (date: Date) => {
+  const timezoneAdjustedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return timezoneAdjustedDate.toISOString().slice(0, 10);
+};
+
+const getDefaultNotVisitedFilters = (): Filters => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  return {
+    ...initialFilters,
+    dateFrom: getDateInputValue(thirtyDaysAgo),
+    dateTo: getDateInputValue(today)
+  };
+};
+
 const formatDisplayDate = (date: string) => {
   const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   return match ? `${match[3]}/${match[2]}/${match[1]}` : date;
@@ -45,7 +63,7 @@ const App: React.FC = () => {
     [TabType.SUMMARY]: { ...initialFilters },
     [TabType.M2M]: { ...initialFilters },
     [TabType.Y2Y]: { ...initialFilters },
-    [TabType.NOT_VISITED]: { ...initialFilters }
+    [TabType.NOT_VISITED]: getDefaultNotVisitedFilters()
   });
 
   const currentFilters = tabFilters[activeTab];
@@ -178,13 +196,14 @@ const App: React.FC = () => {
   }, [filteredData, sortConfig]);
 
   const notVisitedCustomers = useMemo(() => {
-    return sortData(getCustomersNotVisited(rawData, currentFilters), sortConfig);
+    const customers = getCustomersNotVisited(rawData, currentFilters);
+    return sortConfig ? sortData(customers, sortConfig) : customers;
   }, [rawData, currentFilters, sortConfig]);
 
   const totalQty = useMemo(() => filteredData.reduce((sum, r) => sum + r.totalQty, 0), [filteredData]);
 
   const clearFilters = () => {
-    updateCurrentFilters(initialFilters);
+    updateCurrentFilters(activeTab === TabType.NOT_VISITED ? getDefaultNotVisitedFilters() : initialFilters);
   };
 
   const escapeCSV = (val: any) => {

@@ -3,6 +3,11 @@ import { RawSalesRecord, Filters, NotVisitedCustomer, PivotRow, SummaryRow } fro
 import { parseDate, getFiscalYearStart } from './dataService.ts';
 import { SHORT_MONTH_NAMES, MONTH_NAMES } from '../constants.tsx';
 
+const formatLocalDateForFilter = (date: Date) => {
+  const timezoneAdjustedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return timezoneAdjustedDate.toISOString().slice(0, 10);
+};
+
 export const filterData = (data: RawSalesRecord[], filters: Filters): RawSalesRecord[] => {
   return data.filter(row => {
     const date = parseDate(row.date);
@@ -147,11 +152,18 @@ export const getCustomersNotVisited = (data: RawSalesRecord[], filters: Filters)
   const dates = data.map(row => parseDate(row.date)).filter((date): date is Date => date !== null);
   if (!dates.length) return [];
 
-  const latestDate = new Date(Math.max(...dates.map(date => date.getTime())));
   const hasPeriod = Boolean(filters.dateFrom || filters.dateTo || filters.fiscalYears.length || filters.months.length);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
   const periodFilters: Filters = hasPeriod
     ? filters
-    : { ...filters, months: [latestDate.getMonth() + 1], fiscalYears: [getFiscalYearStart(latestDate)] };
+    : {
+        ...filters,
+        dateFrom: formatLocalDateForFilter(thirtyDaysAgo),
+        dateTo: formatLocalDateForFilter(today)
+      };
 
   const matchesContext = (row: RawSalesRecord) => {
     if (filters.customers.length && !filters.customers.includes(row.customer)) return false;
@@ -173,7 +185,7 @@ export const getCustomersNotVisited = (data: RawSalesRecord[], filters: Filters)
     if (!existingDate || rowDate > existingDate) latestByCustomer.set(row.customer, row);
   });
 
-  const referenceDate = hasPeriod && filters.dateTo ? new Date(filters.dateTo) : latestDate;
+  const referenceDate = filters.dateTo ? new Date(filters.dateTo) : today;
   return Array.from(latestByCustomer.values()).map(row => {
     const lastDate = parseDate(row.date)!;
     return {
@@ -183,5 +195,9 @@ export const getCustomersNotVisited = (data: RawSalesRecord[], filters: Filters)
       daysSinceLastVisit: Math.max(0, Math.floor((referenceDate.getTime() - lastDate.getTime()) / 86400000)),
       lastQuantity: row.totalQty
     };
-  }).sort((a, b) => b.daysSinceLastVisit - a.daysSinceLastVisit || a.customer.localeCompare(b.customer));
+  }).sort((a, b) => {
+    const dateA = parseDate(a.lastVisited)!.getTime();
+    const dateB = parseDate(b.lastVisited)!.getTime();
+    return dateA - dateB || a.customer.localeCompare(b.customer);
+  });
 };

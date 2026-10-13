@@ -372,6 +372,22 @@ const App: React.FC = () => {
                     onChange={e => updateCurrentFilters({ dateTo: e.target.value })} 
                   />
                 </div>
+                {activeTab === TabType.NOT_VISITED && (
+                  <div className="flex items-end gap-3">
+                    <button
+                      onClick={downloadExcel}
+                      className="px-8 py-2.5 bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
+                    >
+                      Download Excel
+                    </button>
+                    <button
+                      onClick={clearFilters}
+                      className="px-8 py-2.5 bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                )}
               </>
             )}
             
@@ -428,28 +444,28 @@ const App: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
-            <div className="flex gap-3">
-              <button 
-                onClick={downloadExcel}
-                className="px-8 py-2.5 bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
-              >
-                Download Excel
-              </button>
-              <button 
-                onClick={clearFilters}
-                className="px-8 py-2.5 bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
-              >
-                Clear Filters
-              </button>
-            </div>
-            {activeTab !== TabType.NOT_VISITED && (
+          {activeTab !== TabType.NOT_VISITED && (
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+              <div className="flex gap-3">
+                <button 
+                  onClick={downloadExcel}
+                  className="px-8 py-2.5 bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
+                >
+                  Download Excel
+                </button>
+                <button 
+                  onClick={clearFilters}
+                  className="px-8 py-2.5 bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
+                >
+                  Clear Filters
+                </button>
+              </div>
               <div className="bg-[#ebf5fb] px-6 py-2.5 rounded-lg border border-blue-100">
                 <span className="text-sm font-bold text-slate-700">Total Qty: </span>
                 <span className="text-sm font-black text-blue-600">{totalQty.toLocaleString()}</span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Content Container - Added relative z-10 */}

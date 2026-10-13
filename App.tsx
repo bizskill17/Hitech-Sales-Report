@@ -391,22 +391,6 @@ const App: React.FC = () => {
                     onChange={e => updateCurrentFilters({ dateTo: e.target.value })} 
                   />
                 </div>
-                {activeTab === TabType.NOT_VISITED && (
-                  <div className="flex items-end gap-3">
-                    <button
-                      onClick={downloadExcel}
-                      className="px-5 py-2 whitespace-nowrap bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
-                    >
-                      Download Excel
-                    </button>
-                    <button
-                      onClick={clearFilters}
-                      className="px-5 py-2 whitespace-nowrap bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
-                    >
-                      Clear Filters
-                    </button>
-                  </div>
-                )}
               </>
             )}
 
@@ -417,6 +401,23 @@ const App: React.FC = () => {
                 selected={currentFilters.salespersons}
                 onChange={v => updateCurrentFilters({ salespersons: v })}
               />
+            )}
+
+            {activeTab === TabType.NOT_VISITED && (
+              <div className="flex items-end gap-3">
+                <button
+                  onClick={downloadExcel}
+                  className="px-5 py-2 whitespace-nowrap bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
+                >
+                  Download Excel
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="px-5 py-2 whitespace-nowrap bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
+                >
+                  Clear Filters
+                </button>
+              </div>
             )}
             
             {activeTab !== TabType.NOT_VISITED && (

@@ -409,6 +409,15 @@ const App: React.FC = () => {
                 )}
               </>
             )}
+
+            {activeTab === TabType.NOT_VISITED && (
+              <MultiSelect
+                label="Sales Person"
+                options={filterOptions.salespersons}
+                selected={currentFilters.salespersons}
+                onChange={v => updateCurrentFilters({ salespersons: v })}
+              />
+            )}
             
             {activeTab !== TabType.NOT_VISITED && (
               <>

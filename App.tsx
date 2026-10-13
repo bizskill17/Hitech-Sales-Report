@@ -352,7 +352,7 @@ const App: React.FC = () => {
             { id: TabType.SUMMARY, label: 'Sales Summary' },
             { id: TabType.M2M, label: 'Month-to-Month' },
             { id: TabType.Y2Y, label: 'Year-to-Year' },
-            { id: TabType.NOT_VISITED, label: 'Customer Not Visited' },
+            { id: TabType.NOT_VISITED, label: 'Unbilled Customers' },
           ].map(tab => (
             <button
               key={tab.id}

@@ -447,13 +447,13 @@ const App: React.FC = () => {
           {activeTab !== TabType.NOT_VISITED && (
             <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
               <div className="flex gap-3">
-                <button 
+                <button
                   onClick={downloadExcel}
                   className="px-8 py-2.5 bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
                 >
                   Download Excel
                 </button>
-                <button 
+                <button
                   onClick={clearFilters}
                   className="px-8 py-2.5 bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
                 >

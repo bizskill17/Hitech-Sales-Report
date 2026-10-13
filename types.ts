@@ -47,12 +47,6 @@ export interface NotVisitedCustomer {
   lastQuantity: number;
 }
 
-export interface CustomerVisitPlan {
-  visitDate: string;
-  owner: string;
-  note: string;
-}
-
 export enum TabType {
   SUMMARY = 'summary',
   M2M = 'monthToMonth',

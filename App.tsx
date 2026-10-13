@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { RawSalesRecord, Filters, TabType, CustomerVisitPlan, NotVisitedCustomer } from './types.ts';
+import { RawSalesRecord, Filters, TabType } from './types.ts';
 import { fetchDataFromSource, getFiscalYearStart, getFiscalYearDisplay } from './services/dataService.ts';
 import { filterData, getCustomersNotVisited, getM2MData, getY2YData, getSummaryData } from './services/analysisEngine.ts';
 import { MultiSelect } from './components/MultiSelect.tsx';
@@ -35,11 +35,6 @@ const App: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
 
   const [drillDownInfo, setDrillDownInfo] = useState<{ customer: string; brand: string } | null>(null);
-  const [planningCustomer, setPlanningCustomer] = useState<NotVisitedCustomer | null>(null);
-  const [plans, setPlans] = useState<Record<string, CustomerVisitPlan>>(() => {
-    try { return JSON.parse(localStorage.getItem('customer-visit-plans') || '{}'); } catch { return {}; }
-  });
-  const [planDraft, setPlanDraft] = useState<CustomerVisitPlan>({ visitDate: '', owner: '', note: '' });
 
   const [tabFilters, setTabFilters] = useState<Record<TabType, Filters>>({
     [TabType.SUMMARY]: { ...initialFilters },
@@ -264,11 +259,8 @@ const App: React.FC = () => {
       totalRow.push(y2y.pivotData.reduce((acc, r) => acc + r.total, 0));
       rows.push(totalRow);
     } else if (activeTab === TabType.NOT_VISITED) {
-      headers = ['Customer', 'Last Sales Person', 'Last Activity', 'Days Since Last Activity', 'Last Quantity', 'Planned Visit', 'Plan Owner', 'Plan Note'];
-      rows = notVisitedCustomers.map(row => {
-        const plan = plans[row.customer];
-        return [row.customer, row.salesperson, row.lastVisited, row.daysSinceLastVisit, row.lastQuantity, plan?.visitDate || '', plan?.owner || '', plan?.note || ''];
-      });
+      headers = ['Customer', 'Last Sales Person', 'Last Activity', 'Days Since Last Activity', 'Last Quantity'];
+      rows = notVisitedCustomers.map(row => [row.customer, row.salesperson, row.lastVisited, row.daysSinceLastVisit, row.lastQuantity]);
     }
 
     const metadataHeader = [escapeCSV(getFilterString())];
@@ -311,19 +303,6 @@ const App: React.FC = () => {
     if (!drillDownInfo) return [];
     return filteredData.filter(r => r.customer === drillDownInfo.customer && r.brand === drillDownInfo.brand);
   }, [drillDownInfo, filteredData]);
-
-  const openPlan = (customer: NotVisitedCustomer) => {
-    setPlanningCustomer(customer);
-    setPlanDraft(plans[customer.customer] || { visitDate: '', owner: customer.salesperson, note: '' });
-  };
-
-  const savePlan = () => {
-    if (!planningCustomer) return;
-    const nextPlans = { ...plans, [planningCustomer.customer]: planDraft };
-    setPlans(nextPlans);
-    localStorage.setItem('customer-visit-plans', JSON.stringify(nextPlans));
-    setPlanningCustomer(null);
-  };
 
   if (loading) {
     return (
@@ -368,7 +347,7 @@ const App: React.FC = () => {
         {/* Filters Container - Added z-30 relative to prevent dropdown hide inside table */}
         <div key={`filters-${activeTab}`} className="bg-white rounded-xl shadow-sm p-8 mb-8 border border-slate-200 animate-tab-content relative z-30">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
-            {activeTab === TabType.SUMMARY && (
+            {(activeTab === TabType.SUMMARY || activeTab === TabType.NOT_VISITED) && (
               <>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-semibold text-slate-600">Invoice Date From</label>
@@ -391,33 +370,37 @@ const App: React.FC = () => {
               </>
             )}
             
-            <MultiSelect 
-              label="Customer Name" 
-              options={filterOptions.customers} 
-              selected={currentFilters.customers} 
-              onChange={v => updateCurrentFilters({ customers: v })} 
-            />
-            
-            <MultiSelect 
-              label="Sales Person" 
-              options={filterOptions.salespersons} 
-              selected={currentFilters.salespersons} 
-              onChange={v => updateCurrentFilters({ salespersons: v })} 
-            />
-            
-            <MultiSelect 
-              label="Item Name" 
-              options={filterOptions.items} 
-              selected={currentFilters.items} 
-              onChange={v => updateCurrentFilters({ items: v })} 
-            />
-            
-            <MultiSelect 
-              label="Brand" 
-              options={filterOptions.brands} 
-              selected={currentFilters.brands} 
-              onChange={v => updateCurrentFilters({ brands: v })} 
-            />
+            {activeTab !== TabType.NOT_VISITED && (
+              <>
+                <MultiSelect
+                  label="Customer Name"
+                  options={filterOptions.customers}
+                  selected={currentFilters.customers}
+                  onChange={v => updateCurrentFilters({ customers: v })}
+                />
+
+                <MultiSelect
+                  label="Sales Person"
+                  options={filterOptions.salespersons}
+                  selected={currentFilters.salespersons}
+                  onChange={v => updateCurrentFilters({ salespersons: v })}
+                />
+
+                <MultiSelect
+                  label="Item Name"
+                  options={filterOptions.items}
+                  selected={currentFilters.items}
+                  onChange={v => updateCurrentFilters({ items: v })}
+                />
+
+                <MultiSelect
+                  label="Brand"
+                  options={filterOptions.brands}
+                  selected={currentFilters.brands}
+                  onChange={v => updateCurrentFilters({ brands: v })}
+                />
+              </>
+            )}
             
             {(activeTab === TabType.M2M || activeTab === TabType.Y2Y) && (
               <>
@@ -469,7 +452,7 @@ const App: React.FC = () => {
               {activeTab === TabType.SUMMARY && 'Sales Summary'}
               {activeTab === TabType.M2M && 'Month-to-Month Analysis'}
               {activeTab === TabType.Y2Y && 'Year-to-Year Analysis'}
-              {activeTab === TabType.NOT_VISITED && 'Customer Not Visited – Make Plan'}
+              {activeTab === TabType.NOT_VISITED && 'Customer Not Visited'}
             </h2>
             <p className="text-xs text-slate-400 font-medium italic">
               Default sort by Customer then Brand. Showing records based on active filters for this tab
@@ -695,20 +678,17 @@ const App: React.FC = () => {
                     <th onClick={() => handleSortToggle('salesperson')} className="group px-6 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer"><div className="flex items-center justify-between">Last Sales Person {renderSortIcon('salesperson')}</div></th>
                     <th onClick={() => handleSortToggle('lastVisited')} className="group px-6 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer"><div className="flex items-center justify-between">Last Activity {renderSortIcon('lastVisited')}</div></th>
                     <th onClick={() => handleSortToggle('daysSinceLastVisit')} className="group px-6 py-4 text-xs font-bold uppercase text-center border-r border-slate-500/50 cursor-pointer"><div className="flex items-center justify-center">Days Not Visited {renderSortIcon('daysSinceLastVisit')}</div></th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase text-center">Plan</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300">
                   {notVisitedCustomers.length ? notVisitedCustomers.map((row, i) => {
-                    const plan = plans[row.customer];
                     return <tr key={row.customer} className={i % 2 ? 'bg-slate-50/30' : ''}>
                       <td className="px-6 py-4 text-sm font-bold text-blue-600 uppercase">{row.customer}</td>
                       <td className="px-6 py-4 text-sm text-slate-600 uppercase">{row.salesperson}</td>
                       <td className="px-6 py-4 text-sm text-slate-600">{row.lastVisited}</td>
                       <td className="px-6 py-4 text-sm font-bold text-center text-amber-600">{row.daysSinceLastVisit}</td>
-                      <td className="px-6 py-3 text-center"><button onClick={() => openPlan(row)} className={`px-4 py-2 text-xs font-bold rounded-lg ${plan ? 'bg-emerald-500 text-white' : 'bg-[#3498db] text-white hover:bg-blue-600'}`}>{plan ? `Planned: ${plan.visitDate || 'Saved'}` : 'Make Plan'}</button></td>
                     </tr>;
-                  }) : <tr><td colSpan={5} className="px-8 py-24 text-center text-slate-400">All customers have activity in the selected period.</td></tr>}
+                  }) : <tr><td colSpan={4} className="px-8 py-24 text-center text-slate-400">All customers have activity in the selected period.</td></tr>}
                 </tbody>
               </table>
             )}
@@ -723,18 +703,6 @@ const App: React.FC = () => {
           data={drillDownData} 
           onClose={() => setDrillDownInfo(null)} 
         />
-      )}
-      {planningCustomer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
-          <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
-            <div className="border-b border-slate-100 px-6 py-4"><h3 className="text-lg font-bold text-slate-800">Visit plan: {planningCustomer.customer}</h3><p className="text-xs text-slate-500 mt-1">Last activity: {planningCustomer.lastVisited} · {planningCustomer.daysSinceLastVisit} days ago</p></div>
-            <div className="space-y-4 p-6">
-              <div className="grid grid-cols-2 gap-4"><label className="text-sm font-medium text-slate-600">Visit date<input type="date" value={planDraft.visitDate} onChange={e => setPlanDraft({ ...planDraft, visitDate: e.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" /></label><label className="text-sm font-medium text-slate-600">Owner<input value={planDraft.owner} onChange={e => setPlanDraft({ ...planDraft, owner: e.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" /></label></div>
-              <label className="block text-sm font-medium text-slate-600">Follow-up plan<textarea value={planDraft.note} onChange={e => setPlanDraft({ ...planDraft, note: e.target.value })} rows={3} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Add call or visit objective" /></label>
-            </div>
-            <div className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4"><button onClick={() => setPlanningCustomer(null)} className="px-4 py-2 text-sm font-bold text-slate-500">Cancel</button><button onClick={savePlan} className="rounded-lg bg-[#3498db] px-5 py-2 text-sm font-bold text-white">Save Plan</button></div>
-          </div>
-        </div>
       )}
     </div>
   );

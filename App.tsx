@@ -322,13 +322,13 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#f3f6f9] pb-12 text-slate-900 font-sans">
-      <div className="max-w-[1400px] mx-auto px-4 pt-6">
+      <div className="max-w-[1400px] mx-auto px-4 pt-3">
         
-        <div className="flex justify-center items-center mb-10 px-1 animate-tab-content">
-           <h1 className="text-3xl font-black text-slate-800 tracking-tight">Sales Analysis</h1>
+        <div className="flex justify-center items-center mb-5 px-1 animate-tab-content">
+           <h1 className="text-2xl font-black text-slate-800 tracking-tight">Sales Analysis</h1>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 mb-4">
           {[
             { id: TabType.SUMMARY, label: 'Sales Summary' },
             { id: TabType.M2M, label: 'Month-to-Month' },
@@ -338,7 +338,7 @@ const App: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`py-4 text-[15px] font-bold rounded-t-lg transition-all border-b-4 ${
+              className={`py-3 text-[15px] font-bold rounded-t-lg transition-all border-b-4 ${
                 activeTab === tab.id 
                 ? 'bg-[#3498db] text-white border-blue-600 shadow-md' 
                 : 'bg-white text-slate-400 border-transparent hover:bg-slate-50'
@@ -350,15 +350,15 @@ const App: React.FC = () => {
         </div>
 
         {/* Filters Container - Added z-30 relative to prevent dropdown hide inside table */}
-        <div key={`filters-${activeTab}`} className="bg-white rounded-xl shadow-sm p-8 mb-8 border border-slate-200 animate-tab-content relative z-30">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
+        <div key={`filters-${activeTab}`} className="bg-white rounded-xl shadow-sm p-5 mb-4 border border-slate-200 animate-tab-content relative z-30">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4">
             {(activeTab === TabType.SUMMARY || activeTab === TabType.NOT_VISITED) && (
               <>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[13px] font-semibold text-slate-600">Invoice Date From</label>
                   <input 
                     type="date" 
-                    className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500" 
+                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500" 
                     value={currentFilters.dateFrom} 
                     onChange={e => updateCurrentFilters({ dateFrom: e.target.value })} 
                   />
@@ -367,7 +367,7 @@ const App: React.FC = () => {
                   <label className="text-[13px] font-semibold text-slate-600">Invoice Date To</label>
                   <input 
                     type="date" 
-                    className="px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500" 
+                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500" 
                     value={currentFilters.dateTo} 
                     onChange={e => updateCurrentFilters({ dateTo: e.target.value })} 
                   />
@@ -376,13 +376,13 @@ const App: React.FC = () => {
                   <div className="flex items-end gap-3">
                     <button
                       onClick={downloadExcel}
-                      className="px-8 py-2.5 bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
+                      className="px-5 py-2 whitespace-nowrap bg-[#3498db] text-white text-sm font-bold rounded-lg hover:bg-blue-600 shadow-sm active:scale-95 transition-all"
                     >
                       Download Excel
                     </button>
                     <button
                       onClick={clearFilters}
-                      className="px-8 py-2.5 bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
+                      className="px-5 py-2 whitespace-nowrap bg-[#e74c3c] text-white text-sm font-bold rounded-lg hover:bg-red-600 shadow-sm active:scale-95 transition-all"
                     >
                       Clear Filters
                     </button>
@@ -445,7 +445,7 @@ const App: React.FC = () => {
           </div>
 
           {activeTab !== TabType.NOT_VISITED && (
-            <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
               <div className="flex gap-3">
                 <button
                   onClick={downloadExcel}
@@ -486,7 +486,7 @@ const App: React.FC = () => {
           <div 
             tabIndex={0}
             onKeyDown={handleTableKeyDown}
-            className="overflow-auto custom-scrollbar max-h-[600px] outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+            className="overflow-auto custom-scrollbar max-h-[600px] outline-none focus:ring-2 focus:ring-blue-100 transition-all [&_th]:!py-2.5 [&_td]:!py-2.5"
           >
             {activeTab === TabType.SUMMARY && (
               <table className="w-full text-left border-collapse border border-slate-200">

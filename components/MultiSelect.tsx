@@ -48,7 +48,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({ label, options, select
       <label className="text-[13px] font-semibold text-slate-600">{label}</label>
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between px-3 py-2 bg-white border border-slate-300 rounded-lg cursor-pointer hover:border-blue-400 transition-all shadow-sm min-h-[42px]"
+        className="flex items-center justify-between px-3 py-1.5 bg-white border border-slate-300 rounded-lg cursor-pointer hover:border-blue-400 transition-all shadow-sm min-h-[36px]"
       >
         <span className="text-sm truncate text-slate-500">
           {selected.length === 0 ? (placeholder || label) : `${label}`}

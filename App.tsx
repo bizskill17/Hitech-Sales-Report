@@ -264,8 +264,8 @@ const App: React.FC = () => {
       totalRow.push(y2y.pivotData.reduce((acc, r) => acc + r.total, 0));
       rows.push(totalRow);
     } else if (activeTab === TabType.NOT_VISITED) {
-      headers = ['Customer', 'Last Sales Person', 'Last Activity', 'Days Since Last Activity', 'Last Quantity'];
-      rows = notVisitedCustomers.map(row => [row.customer, row.salesperson, formatDisplayDate(row.lastVisited), row.daysSinceLastVisit, row.lastQuantity]);
+      headers = ['Customer', 'Last Sales Person', 'Last Activity', 'Last Quantity'];
+      rows = notVisitedCustomers.map(row => [row.customer, row.salesperson, formatDisplayDate(row.lastVisited), row.lastQuantity]);
     }
 
     const metadataHeader = [escapeCSV(getFilterString())];
@@ -443,26 +443,29 @@ const App: React.FC = () => {
                 Clear Filters
               </button>
             </div>
-            <div className="bg-[#ebf5fb] px-6 py-2.5 rounded-lg border border-blue-100">
-              <span className="text-sm font-bold text-slate-700">Total Qty: </span>
-              <span className="text-sm font-black text-blue-600">{totalQty.toLocaleString()}</span>
-            </div>
+            {activeTab !== TabType.NOT_VISITED && (
+              <div className="bg-[#ebf5fb] px-6 py-2.5 rounded-lg border border-blue-100">
+                <span className="text-sm font-bold text-slate-700">Total Qty: </span>
+                <span className="text-sm font-black text-blue-600">{totalQty.toLocaleString()}</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Content Container - Added relative z-10 */}
         <div key={`content-${activeTab}`} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-tab-content relative z-10">
-          <div className="px-8 py-5 border-b border-slate-100 bg-white flex justify-between items-center">
-            <h2 className="text-lg font-bold text-slate-800">
-              {activeTab === TabType.SUMMARY && 'Sales Summary'}
-              {activeTab === TabType.M2M && 'Month-to-Month Analysis'}
-              {activeTab === TabType.Y2Y && 'Year-to-Year Analysis'}
-              {activeTab === TabType.NOT_VISITED && 'Customer Not Visited'}
-            </h2>
-            <p className="text-xs text-slate-400 font-medium italic">
-              Default sort by Customer then Brand. Showing records based on active filters for this tab
-            </p>
-          </div>
+          {activeTab !== TabType.NOT_VISITED && (
+            <div className="px-8 py-5 border-b border-slate-100 bg-white flex justify-between items-center">
+              <h2 className="text-lg font-bold text-slate-800">
+                {activeTab === TabType.SUMMARY && 'Sales Summary'}
+                {activeTab === TabType.M2M && 'Month-to-Month Analysis'}
+                {activeTab === TabType.Y2Y && 'Year-to-Year Analysis'}
+              </h2>
+              <p className="text-xs text-slate-400 font-medium italic">
+                Default sort by Customer then Brand. Showing records based on active filters for this tab
+              </p>
+            </div>
+          )}
 
           <div 
             tabIndex={0}
@@ -682,7 +685,6 @@ const App: React.FC = () => {
                     <th onClick={() => handleSortToggle('customer')} className="group px-6 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer"><div className="flex items-center justify-between">Customer {renderSortIcon('customer')}</div></th>
                     <th onClick={() => handleSortToggle('salesperson')} className="group px-6 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer"><div className="flex items-center justify-between">Last Sales Person {renderSortIcon('salesperson')}</div></th>
                     <th onClick={() => handleSortToggle('lastVisited')} className="group px-6 py-4 text-xs font-bold uppercase border-r border-slate-500/50 cursor-pointer"><div className="flex items-center justify-between">Last Activity {renderSortIcon('lastVisited')}</div></th>
-                    <th onClick={() => handleSortToggle('daysSinceLastVisit')} className="group px-6 py-4 text-xs font-bold uppercase text-center border-r border-slate-500/50 cursor-pointer"><div className="flex items-center justify-center">Days Not Visited {renderSortIcon('daysSinceLastVisit')}</div></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300">
@@ -691,9 +693,8 @@ const App: React.FC = () => {
                       <td className="px-6 py-4 text-sm font-bold text-blue-600 uppercase">{row.customer}</td>
                       <td className="px-6 py-4 text-sm text-slate-600 uppercase">{row.salesperson}</td>
                       <td className="px-6 py-4 text-sm text-slate-600">{formatDisplayDate(row.lastVisited)}</td>
-                      <td className="px-6 py-4 text-sm font-bold text-center text-amber-600">{row.daysSinceLastVisit}</td>
                     </tr>;
-                  }) : <tr><td colSpan={4} className="px-8 py-24 text-center text-slate-400">All customers have activity in the selected period.</td></tr>}
+                  }) : <tr><td colSpan={3} className="px-8 py-24 text-center text-slate-400">All customers have activity in the selected period.</td></tr>}
                 </tbody>
               </table>
             )}

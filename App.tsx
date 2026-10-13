@@ -21,6 +21,11 @@ const initialFilters: Filters = {
   months: []
 };
 
+const formatDisplayDate = (date: string) => {
+  const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? `${match[3]}/${match[2]}/${match[1]}` : date;
+};
+
 interface SortConfig {
   key: string;
   direction: 'asc' | 'desc';
@@ -260,7 +265,7 @@ const App: React.FC = () => {
       rows.push(totalRow);
     } else if (activeTab === TabType.NOT_VISITED) {
       headers = ['Customer', 'Last Sales Person', 'Last Activity', 'Days Since Last Activity', 'Last Quantity'];
-      rows = notVisitedCustomers.map(row => [row.customer, row.salesperson, row.lastVisited, row.daysSinceLastVisit, row.lastQuantity]);
+      rows = notVisitedCustomers.map(row => [row.customer, row.salesperson, formatDisplayDate(row.lastVisited), row.daysSinceLastVisit, row.lastQuantity]);
     }
 
     const metadataHeader = [escapeCSV(getFilterString())];
@@ -685,7 +690,7 @@ const App: React.FC = () => {
                     return <tr key={row.customer} className={i % 2 ? 'bg-slate-50/30' : ''}>
                       <td className="px-6 py-4 text-sm font-bold text-blue-600 uppercase">{row.customer}</td>
                       <td className="px-6 py-4 text-sm text-slate-600 uppercase">{row.salesperson}</td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{row.lastVisited}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{formatDisplayDate(row.lastVisited)}</td>
                       <td className="px-6 py-4 text-sm font-bold text-center text-amber-600">{row.daysSinceLastVisit}</td>
                     </tr>;
                   }) : <tr><td colSpan={4} className="px-8 py-24 text-center text-slate-400">All customers have activity in the selected period.</td></tr>}

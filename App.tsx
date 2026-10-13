@@ -358,7 +358,7 @@ const App: React.FC = () => {
                   <label className="text-[13px] font-semibold text-slate-600">Invoice Date From</label>
                   <input 
                     type="date" 
-                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500" 
+                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500"
                     value={currentFilters.dateFrom} 
                     onChange={e => updateCurrentFilters({ dateFrom: e.target.value })} 
                   />
@@ -367,7 +367,7 @@ const App: React.FC = () => {
                   <label className="text-[13px] font-semibold text-slate-600">Invoice Date To</label>
                   <input 
                     type="date" 
-                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500" 
+                    className="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500"
                     value={currentFilters.dateTo} 
                     onChange={e => updateCurrentFilters({ dateTo: e.target.value })} 
                   />

@@ -39,8 +39,23 @@ export interface PivotRow {
   [key: string]: string | number;
 }
 
+export interface NotVisitedCustomer {
+  customer: string;
+  salesperson: string;
+  lastVisited: string;
+  daysSinceLastVisit: number;
+  lastQuantity: number;
+}
+
+export interface CustomerVisitPlan {
+  visitDate: string;
+  owner: string;
+  note: string;
+}
+
 export enum TabType {
   SUMMARY = 'summary',
   M2M = 'monthToMonth',
-  Y2Y = 'yearToYear'
+  Y2Y = 'yearToYear',
+  NOT_VISITED = 'notVisited'
 }

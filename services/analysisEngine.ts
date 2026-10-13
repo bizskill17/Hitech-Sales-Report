@@ -1,5 +1,5 @@
 
-import { RawSalesRecord, Filters, PivotRow, SummaryRow } from '../types.ts';
+import { RawSalesRecord, Filters, NotVisitedCustomer, PivotRow, SummaryRow } from '../types.ts';
 import { parseDate, getFiscalYearStart } from './dataService.ts';
 import { SHORT_MONTH_NAMES, MONTH_NAMES } from '../constants.tsx';
 
@@ -137,4 +137,51 @@ export const getY2YData = (data: RawSalesRecord[]) => {
     fiscalYears: sortedFYs,
     monthOrder: fiscalMonthOrder.map(idx => SHORT_MONTH_NAMES[idx])
   };
+};
+
+/**
+ * Finds customers with past sales activity but no activity in the selected period.
+ * When no period is selected, the latest month available in the data is used.
+ */
+export const getCustomersNotVisited = (data: RawSalesRecord[], filters: Filters): NotVisitedCustomer[] => {
+  const dates = data.map(row => parseDate(row.date)).filter((date): date is Date => date !== null);
+  if (!dates.length) return [];
+
+  const latestDate = new Date(Math.max(...dates.map(date => date.getTime())));
+  const hasPeriod = Boolean(filters.dateFrom || filters.dateTo || filters.fiscalYears.length || filters.months.length);
+  const periodFilters: Filters = hasPeriod
+    ? filters
+    : { ...filters, months: [latestDate.getMonth() + 1], fiscalYears: [getFiscalYearStart(latestDate)] };
+
+  const matchesContext = (row: RawSalesRecord) => {
+    if (filters.customers.length && !filters.customers.includes(row.customer)) return false;
+    if (filters.brands.length && !filters.brands.includes(row.brand)) return false;
+    if (filters.salespersons.length && !filters.salespersons.includes(row.salesperson)) return false;
+    if (filters.items.length && !filters.items.includes(row.item)) return false;
+    if (filters.statuses.length && !filters.statuses.includes(row.status)) return false;
+    return true;
+  };
+
+  const activeCustomers = new Set(filterData(data, periodFilters).map(row => row.customer));
+  const latestByCustomer = new Map<string, RawSalesRecord>();
+
+  data.filter(matchesContext).forEach(row => {
+    const rowDate = parseDate(row.date);
+    if (!rowDate || activeCustomers.has(row.customer)) return;
+    const existing = latestByCustomer.get(row.customer);
+    const existingDate = existing ? parseDate(existing.date) : null;
+    if (!existingDate || rowDate > existingDate) latestByCustomer.set(row.customer, row);
+  });
+
+  const referenceDate = hasPeriod && filters.dateTo ? new Date(filters.dateTo) : latestDate;
+  return Array.from(latestByCustomer.values()).map(row => {
+    const lastDate = parseDate(row.date)!;
+    return {
+      customer: row.customer,
+      salesperson: row.salesperson,
+      lastVisited: row.date,
+      daysSinceLastVisit: Math.max(0, Math.floor((referenceDate.getTime() - lastDate.getTime()) / 86400000)),
+      lastQuantity: row.totalQty
+    };
+  }).sort((a, b) => b.daysSinceLastVisit - a.daysSinceLastVisit || a.customer.localeCompare(b.customer));
 };
